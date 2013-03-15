@@ -13,11 +13,13 @@ DualTouch::~DualTouch(void)
 
 void DualTouch::init1()
 {
-	m_velocityY = 7.0f;
-	m_velocityZ = 5.0f;
+	m_velocityY = 25.0f;
+	m_velocityZ = 2.0f;
+	m_impactY = -2;
 	m_moveTarget = false;
+	m_timeSpeed = 0.01;
 	m_theta = 45;
-	m_lunch_z = 5;
+	m_lunch_z = 3.5;
 	m_lunch_y = 15;
 	m_renderer.init();
 	m_physic.init();
@@ -113,6 +115,7 @@ void DualTouch::generateCube(){
 		int f = rand() % r;
 		btTransform * t = new btTransform(btQuaternion(),btVector3(f-r/2,15,m_lunch_z)); 
 		//btCollisionShape * shape = new btBoxShape (btVector3(hx,hy,hz));
+		// make a trajectory object
 		btCollisionShape * shape = new btSphereShape (hx);	
 		btRigidBody* body = m_physic.addRigidBody(4,t,shape);
 		body->setCollisionFlags( body->getCollisionFlags() | 
@@ -121,8 +124,10 @@ void DualTouch::generateCube(){
 		
 		// z height
 		//body->setLinearVelocity(btVector3(0,-m_velocity*2,m_velocity/4));
+		// make the others know about the throw
 		m_curentThrowed = body;
 		m_hds.setThrown(m_curentThrowed);
+		m_hds.setImpactPos(&this->getFinalPos(m_curentThrowed));
 		m_curentObject = m_renderer.addObject(new Object(shape,t,blue));
 		//m_throwed_object_list.push_back(m_renderer.addObject(new Object(shape,t,blue)));
 		//m_throwed_rigid_list.push_back(body);
@@ -133,6 +138,23 @@ void DualTouch::generateCube(){
 		m_time = 0;
 }
 
+btVector3 DualTouch::getFinalPos(btRigidBody* target){
+	btScalar time = 0;
+	btTransform* mytrans = new btTransform;
+	target->getMotionState()->getWorldTransform(*mytrans);
+	btVector3 gravity = m_physic.m_dynamicsWorld->getGravity();
+	btScalar y = m_lunch_y;
+	btScalar z = 0;
+	while(y>=m_impactY){
+		y = m_velocityY * cos(m_theta) * time;
+		y = m_lunch_y - y;
+		z = (gravity.z()/2 * pow(time,2)) +( m_velocityZ * sin(m_theta)*time) +  m_lunch_z;
+		time += m_timeSpeed; 
+	}
+
+	return btVector3(mytrans->getOrigin().x(),y,z);
+}
+
 void DualTouch::moveTarget(btScalar time,btRigidBody* target){
 	btTransform* mytrans = new btTransform;
 	target->getMotionState()->getWorldTransform(*mytrans);
@@ -140,25 +162,26 @@ void DualTouch::moveTarget(btScalar time,btRigidBody* target){
 	btScalar y = m_velocityY * cos(m_theta) * time;
 	y = m_lunch_y - y;
 	btScalar z = (gravity.z()/2 * pow(time,2)) +( m_velocityZ * sin(m_theta)*time) +  m_lunch_z;
-	cout<< " position  " << mytrans->getOrigin().x() << "  " <<
-							mytrans->getOrigin().y() << "  " <<
-							mytrans->getOrigin().z() << "  " <<
-							endl;
+	
 	mytrans->getOrigin().setY(y);
 	mytrans->getOrigin().setZ(z);
 	target->getMotionState()->setWorldTransform(*mytrans);	
-	if(y<-2)
-	{
+	//if(y< m_lunch_y + m_impactY )
+	//{
 		// create a new rigidbody for bullet
 		btCollisionShape * shape = new btSphereShape (0.3f);	
-		btRigidBody* newTarget = m_physic.addRigidBody(4,mytrans,shape);		
-		
+		btRigidBody* newTarget = m_physic.addRigidBody(4,mytrans,shape);
+		// integrate velocity
+		btScalar vy = -m_velocityY * cos(m_theta);
+		btScalar vz = gravity.z()*time  +  m_velocityZ * sin(m_theta);
+		newTarget->setLinearVelocity(btVector3(0,vy,vz));
 		m_hds.setThrown(newTarget);
-		Object* newObject =m_renderer.addObject(new Object(shape,mytrans,blue));
+		Object* newObject = new Object(shape,mytrans,blue);
 		
 		//delete the previous target
 		m_physic.deleteRigidBody(m_curentThrowed);
 		//m_renderer.delObject(m_curentObject); 
+		m_renderer.replaceObject(m_curentObject, newObject);
 
 		//m_physic.resetRigidBody(target);
 		// update
@@ -166,7 +189,7 @@ void DualTouch::moveTarget(btScalar time,btRigidBody* target){
 		m_curentObject = newObject;
 		m_moveTarget = false;
 		m_time = 0;	
-	}
+	//}
 }
 
 void DualTouch::deleteThrowedObjects(){
@@ -236,7 +259,7 @@ void DualTouch::idle()
 	
 	if(m_moveTarget)
 	{
-		m_time+=0.03;
+		m_time+= m_timeSpeed;
 		moveTarget(m_time,m_curentThrowed); 		
 	}
 }
@@ -297,11 +320,13 @@ void DualTouch::keyboard1(unsigned char key, int x, int y)
 		case('r'):deleteThrowedObjects();
 				break;
 		case('+'):
-		case('p'): m_velocityY += 0.2f;
+		case('p'): m_velocityY += 0.3f;
+				   m_velocityZ -= 0.03f;
 				   cout<<" velocity Y "<<m_velocityY<<endl;
 				break;
 		case('-'):
-		case('o'): m_velocityY -= 0.2f;
+		case('o'): m_velocityY -= 0.3f;
+				   m_velocityZ += 0.03f;
 				   cout<<" velocity Y "<<m_velocityY<<endl;
 				break;
 		default:

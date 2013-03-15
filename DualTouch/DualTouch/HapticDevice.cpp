@@ -48,10 +48,7 @@ HDCallbackCode HDCALLBACK HapticDevice::aSchedule(void *pUserData)
 		{
 			HapticData * data = hs[i].m_data;
 
-			hduVector3Dd force( 0, 0, 0 );
-			
-			
-
+			hduVector3Dd force( 0, 0, 0 );				
 			hdBeginFrame(hs[i].m_data->m_id);		
 
 			HDdouble forceClamp;
@@ -353,6 +350,9 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 								delete m_itsConstraints[i];
 								m_itsConstraints[i]=NULL;
 								m_deleteConstraint(m_ptr,collideBody,i);
+								m_hss[i].setThrown(NULL);
+							    m_hss[i].m_free.m_done = true;
+								m_variator = 0;
 							}
 						}
 
@@ -401,7 +401,7 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 				
 				hduVector3Dd ball = invertTransform(&(m_hss[i].m_free.m_currentThrown->getWorldTransform().getOrigin()), &m_hss[i]);
 				
-				hduVector3Dd objectif(ball); 
+				//hduVector3Dd objectif(ball); 
 				//
 				HDdouble x = ball[0] - m_hss[i].m_free.m_position[0]; //current.getX() - effector.x();
 				HDdouble y = ball[1] - m_hss[i].m_free.m_position[1]; //current.getY() - effector.y();
@@ -409,29 +409,40 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 				if(inrange(x,y,z)){
 					//truncate(&x,&y,&z);
 					// intersect point
-					btVector3 vt =  m_hss[i].m_free.m_currentThrown->getInterpolationLinearVelocity();
-					hduVector3Dd velocity = invertTransform(&(vt), &m_hss[i]);
+					//btVector3 vt =  m_hss[i].m_free.m_currentThrown->getInterpolationLinearVelocity();
+					//hduVector3Dd velocity = invertTransform(&(vt), &m_hss[i]);
 					
 					
 				
-					
+					hduVector3Dd impact = invertTransform(m_impactPos, &m_hss[i]);
 					hduVector3Dd pos(m_hss[i].m_free.m_position); 
 					
 					
-					if(!m_hss[i].m_free.m_done){				
-				
+					if(!m_hss[i].m_free.m_done){	
+						if(m_variator < VARIATION_MAX)
+							m_variator += 0.008;
 						//inbetween += velocity ;
 						//inbetween[2] = 0;
 						//hduVector3Dd helpForce(inbetween) ;
 						//hduVector3Dd helpForce(x, y, z);		
-						hduVector3Dd helpForce = ComputeForce(&pos,&ball,&velocity);
-					
-						m_hss[i].m_free.m_force = 0.2 * helpForce;
+						//hduVector3Dd helpForce = ComputeForce(&pos,&ball,&velocity);
+						hduVector3Dd helpForce = ForecToImpact(&pos,&impact);
+						if(!helpForce.isZero(EPSILON)){
+							m_hss[i].m_free.m_force = m_variator * helpForce;		
+							//std::cout<<" "<<m_variator<<" "<<std::endl;
+						}else 
+							{
+							 m_hss[i].m_free.m_done = true;
+							 m_variator = 0;
+						    }
 				
-				
-					}
+					}else						
+						 m_variator = 0;
 				}
-				else m_hss[i].m_free.m_force = hduVector3Dd(0,0,0); 
+				else{
+					m_variator = 0;
+					m_hss[i].m_free.m_force = hduVector3Dd(0,0,0);
+					}
 			hdScheduleSynchronous(sScheduleIn, &m_hss, HD_DEFAULT_SCHEDULER_PRIORITY);
 		}
 	}
@@ -555,14 +566,14 @@ void HapticDevice::truncate(HDdouble* x,HDdouble* y,HDdouble* z){
 
 bool HapticDevice::inrange(HDdouble x,HDdouble y,HDdouble z){
 	
-	if(x>MXDISTANCE * 0.8) return false;
-	if(x<MNDISTANCE * 0.8) return false;
+	if(x>MXDISTANCE ) return false;
+	if(x<MNDISTANCE ) return false;
 
 	if(y>MXDISTANCE) return false;
 	if(y<MNDISTANCE) return false;
 
 	if(z>MXDISTANCE) return false;
-	if(z<MNDISTANCE) return false;
+	//if(z<MNDISTANCE) return false;
 
 	return true;
 }
@@ -589,4 +600,31 @@ hduVector3Dd HapticDevice::ComputeForce(hduVector3Dd* effector, hduVector3Dd* ta
 	//inbetween[1] = yy;
 	inbetween[2] = 2;
 	return inbetween;
+}
+
+hduVector3Dd HapticDevice::ForecToImpact(hduVector3Dd* effector,hduVector3Dd* impactpos){
+	//hduVector3Dd objectif(*impactpos);
+	hduVector3Dd inbetween = *impactpos - *effector;
+	/*const HDdouble stepSize = 1.0;					
+	if (inbetween.magnitude() > stepSize)
+		{
+		inbetween.normalize();
+		objectif += inbetween*1.0;
+		}
+	else
+		{
+		objectif = *effector;
+		}
+	inbetween = objectif - *effector;
+	//inbetween[2] = 0;*/
+	return inbetween;
+}
+
+void HapticDevice::setImpactPos(btVector3* pos){
+	m_impactPos = new btVector3(*pos); 
+	m_hss[0].setImpactPos(new btVector3(*pos));
+}
+
+void HapticSynchronizer::setImpactPos(btVector3* m_impactPos){
+	m_data->m_impactPos = m_impactPos;
 }

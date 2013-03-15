@@ -39,6 +39,7 @@ public:
 	void setClearColor(float r,float g,float b){m_clearColor[0]=r;m_clearColor[1]=g;m_clearColor[2]=b;}
 	Object* addObject(Object * object);
 	void delObject(Object* o);
+	void replaceObject(Object* oldObject, Object* newObject);
 	Object * getObject(btCollisionShape * shape);
 
 private:

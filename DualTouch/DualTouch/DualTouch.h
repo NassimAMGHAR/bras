@@ -41,6 +41,7 @@ public:
 	void createScene();
 	void createCursor(unsigned int deviceId);
 
+	btVector3 getFinalPos(btRigidBody* target);
 	void moveTarget(btScalar time,btRigidBody* target);
 	void generateCube();	
 	void deleteThrowedObjects();
@@ -74,5 +75,8 @@ public:
 	btScalar m_theta;
 	btScalar m_lunch_z;
 	btScalar m_lunch_y;
+	btScalar m_timeSpeed;
+	btScalar m_impactY;
+	btVector3 m_impactPos;
 
 };

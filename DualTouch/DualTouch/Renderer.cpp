@@ -95,6 +95,20 @@ void Renderer::delObject(Object* o)
 	for(unsigned int i=0;i<m_objects.size();i++)
 		if(o == m_objects[i])
 		{
+			m_objects[i] = NULL;
+		//delete m_objects[i];
+		//delete o;
+		}
+	
+}
+
+void Renderer::replaceObject(Object* oldObject, Object* newObject)
+{
+	for(unsigned int i=0;i<m_objects.size();i++)
+		if(oldObject == m_objects[i])
+		{
+		m_objects[i] = NULL;
+		m_objects[i] = newObject;
 		//delete m_objects[i];
 		//delete o;
 		}
@@ -297,107 +311,108 @@ void Renderer::renderScene()
 
 
 	for(unsigned int i=0;i<m_objects.size();i++)
-	{
-		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,m_objects[i]->m_color.m_floats);
-		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,m_objects[i]->m_color.m_floats);
+	{if(m_objects[i] != NULL){
+			glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,m_objects[i]->m_color.m_floats);
+			glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,m_objects[i]->m_color.m_floats);
 
-		if(m_objects[i]->m_texture) 
-		{
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D,m_texturehandle);
-		} else
-		{
-			glDisable(GL_TEXTURE_2D);
-		}
-
-		switch(m_objects[i]->m_shape->getShapeType())
-		{
-			case(BOX_SHAPE_PROXYTYPE):
+			if(m_objects[i]->m_texture) 
 			{
-				const btBoxShape* boxShape = static_cast<const btBoxShape*>(m_objects[i]->m_shape);
-				btVector3 extent = boxShape->getHalfExtentsWithMargin();
-				extent*=2;
-
-				btScalar m[16];
-				m_objects[i]->m_transform->getOpenGLMatrix(m);
-
-				glPushMatrix();
-				glMultMatrixf(m);
-
-				drawBox(extent);
-
-				glPopMatrix();
-				break;
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D,m_texturehandle);
+			} else
+			{
+				glDisable(GL_TEXTURE_2D);
 			}
-			case(CONE_SHAPE_PROXYTYPE):
+
+			switch(m_objects[i]->m_shape->getShapeType())
 			{
-				const btConeShape* coneShape = static_cast<const btConeShape*>(m_objects[i]->m_shape);
-				int upIndex = coneShape->getConeUpIndex();
-				float radius = coneShape->getRadius();//+coneShape->getMargin();
-				float height = coneShape->getHeight();//+coneShape->getMargin();
-				switch (upIndex)
+				case(BOX_SHAPE_PROXYTYPE):
 				{
-				case 0:
-					glRotatef(90.0, 0.0, 1.0, 0.0);
-					break;
-				case 1:
-					glRotatef(-90.0, 1.0, 0.0, 0.0);
-					break;
-				case 2:
-					break;
-				default:
-					{
-					}
-				};
+					const btBoxShape* boxShape = static_cast<const btBoxShape*>(m_objects[i]->m_shape);
+					btVector3 extent = boxShape->getHalfExtentsWithMargin();
+					extent*=2;
 
-				btScalar m[16];
-				m_objects[i]->m_transform->getOpenGLMatrix(m);
+					btScalar m[16];
+					m_objects[i]->m_transform->getOpenGLMatrix(m);
 
-				glPushMatrix();
-
+					glPushMatrix();
 					glMultMatrixf(m);
-					glTranslatef(0.0, 0.0, -0.5f*height);
-					drawCone(radius,height);
+
+					drawBox(extent);
+
+					glPopMatrix();
+					break;
+				}
+				case(CONE_SHAPE_PROXYTYPE):
+				{
+					const btConeShape* coneShape = static_cast<const btConeShape*>(m_objects[i]->m_shape);
+					int upIndex = coneShape->getConeUpIndex();
+					float radius = coneShape->getRadius();//+coneShape->getMargin();
+					float height = coneShape->getHeight();//+coneShape->getMargin();
+					switch (upIndex)
+					{
+					case 0:
+						glRotatef(90.0, 0.0, 1.0, 0.0);
+						break;
+					case 1:
+						glRotatef(-90.0, 1.0, 0.0, 0.0);
+						break;
+					case 2:
+						break;
+					default:
+						{
+						}
+					};
+
+					btScalar m[16];
+					m_objects[i]->m_transform->getOpenGLMatrix(m);
+
+					glPushMatrix();
+
+						glMultMatrixf(m);
+						glTranslatef(0.0, 0.0, -0.5f*height);
+						drawCone(radius,height);
 				
-				glPopMatrix();
+					glPopMatrix();
 
 
-				break;
-			}
-			case(CYLINDER_SHAPE_PROXYTYPE):
-			{
-				const btCylinderShape* cylinder = static_cast<const btCylinderShape*>(m_objects[i]->m_shape);
+					break;
+				}
+				case(CYLINDER_SHAPE_PROXYTYPE):
+				{
+					const btCylinderShape* cylinder = static_cast<const btCylinderShape*>(m_objects[i]->m_shape);
 
-				int upAxis = cylinder->getUpAxis();
-				float radius = cylinder->getRadius();
-				float halfHeight = cylinder->getHalfExtentsWithMargin()[upAxis];
+					int upAxis = cylinder->getUpAxis();
+					float radius = cylinder->getRadius();
+					float halfHeight = cylinder->getHalfExtentsWithMargin()[upAxis];
 
-				btScalar m[16];
-				m_objects[i]->m_transform->getOpenGLMatrix(m);
+					btScalar m[16];
+					m_objects[i]->m_transform->getOpenGLMatrix(m);
 
-				glPushMatrix();
-				glMultMatrixf(m);
+					glPushMatrix();
+					glMultMatrixf(m);
 
-				drawCylinder(radius,halfHeight,upAxis);
+					drawCylinder(radius,halfHeight,upAxis);
 
-				glPopMatrix();
-				break;
-			}
-			case(SPHERE_SHAPE_PROXYTYPE):
-			{
-				const btSphereShape* sphereShape = static_cast<const btSphereShape*>(m_objects[i]->m_shape);
-				btScalar radius = sphereShape->getRadius();
+					glPopMatrix();
+					break;
+				}
+				case(SPHERE_SHAPE_PROXYTYPE):
+				{
+					const btSphereShape* sphereShape = static_cast<const btSphereShape*>(m_objects[i]->m_shape);
+					btScalar radius = sphereShape->getRadius();
 
-				btScalar m[16];
-				m_objects[i]->m_transform->getOpenGLMatrix(m);
+					btScalar m[16];
+					m_objects[i]->m_transform->getOpenGLMatrix(m);
 
-				glPushMatrix();
-				glMultMatrixf(m);
+					glPushMatrix();
+					glMultMatrixf(m);
 
-				drawSphere(radius);
+					drawSphere(radius);
 
-				glPopMatrix();
-				break;
+					glPopMatrix();
+					break;
+				}
 			}
 		}
 	}
@@ -409,17 +424,18 @@ void Renderer::renderShadows()
 	glDisable(GL_LIGHTING);
 	for(unsigned int i=0;i<m_objects.size();i++)
 	{
+		if(m_objects[i] != NULL)
+		{
+			btScalar m[16];
+			m_objects[i]->m_transform->getOpenGLMatrix(m);
 
-		btScalar m[16];
-		m_objects[i]->m_transform->getOpenGLMatrix(m);
+			glPushMatrix();
+			glMultMatrixf(m);
 
-		glPushMatrix();
-		glMultMatrixf(m);
-
-		glColor3f(0.2f,0.2f,0.2f);
-		//drawShadow(m_objects[i]->m_shape,extrusion*m_objects[i]->m_transform->getBasis());
-		glPopMatrix();
-
+			glColor3f(0.2f,0.2f,0.2f);
+			//drawShadow(m_objects[i]->m_shape,extrusion*m_objects[i]->m_transform->getBasis());
+			glPopMatrix();
+		}
 	}
 }
 

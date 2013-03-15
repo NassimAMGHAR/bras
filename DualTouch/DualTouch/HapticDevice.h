@@ -25,6 +25,7 @@
 #define MNFORCE -MXFORCE
 #define MXDISTANCE 50
 #define MNDISTANCE -MXDISTANCE
+#define VARIATION_MAX 0.25
 
 const btVector3 green(0.0f,1.0f,0.0f);
 const btVector3 orange(0.66f,0.33f,0.22f);
@@ -57,6 +58,7 @@ class HapticData
 	int m_smother;
 	bool m_done;
 	bool m_continusFeadBack;
+	btVector3* m_impactPos;
 	
 };
 
@@ -69,6 +71,7 @@ class HapticSynchronizer
 	void setData(HapticData *data){m_data=data;}
 	void setThrownList(std::vector <btRigidBody *> thrown);
 	void setThrown(btRigidBody * thrown);
+	void setImpactPos(btVector3* m_impactPos);
 	void setThrownObject(std::vector <Object *> thrown_object);
 	void setNear(btVector3* pos);
 	HapticData * m_data;
@@ -76,6 +79,7 @@ class HapticSynchronizer
 	btTransform m_effectors;
 	btTransform* m_cameraViews;
 	btGeneric6DofConstraint* m_constraints;
+	btScalar m_timeK;
 };
 
 class HapticDevice
@@ -101,6 +105,7 @@ public:
 	static btTransform transform(HapticSynchronizer* hdd,HapticData* data);
 	static hduVector3Dd invertTransform(btVector3* trans,HapticSynchronizer* hs);
 	static hduVector3Dd ComputeForce(hduVector3Dd* effector, hduVector3Dd* target, hduVector3Dd* velocity);
+	static hduVector3Dd ForecToImpact(hduVector3Dd* effector,hduVector3Dd* impactpos);
 
 	void(*m_newConstraint)(void * ptr,btRigidBody *,unsigned int );
 	void(*m_deleteConstraint)(void * ptr,btRigidBody *,unsigned int );
@@ -110,6 +115,7 @@ public:
 	void setDThrownList(std::vector <btRigidBody *> thrown);
 	void setThrown(btRigidBody * thrown);
 	void setDThrownObject(std::vector <Object *> thrown_object);
+	void setImpactPos(btVector3* pos);
 
 	static void truncate(HDdouble* x,HDdouble* y,HDdouble* z);
 	static bool inrange(HDdouble x,HDdouble y,HDdouble z);
@@ -123,7 +129,9 @@ private:
 	btGeneric6DofConstraint* m_constraints[NB_DEVICES_MAX];
 	btTypedConstraint* m_itsConstraints[NB_DEVICES_MAX];
 	btTransform  * m_cameraViews[NB_DEVICES_MAX];
-	HDint m_oldButtons[NB_DEVICES_MAX];		
+	HDint m_oldButtons[NB_DEVICES_MAX];	
+	btVector3* m_impactPos;
+	btScalar m_variator; 
 };
 
 
