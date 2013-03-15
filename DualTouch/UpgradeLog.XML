@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="DualTouch">
+</Property><Property Name="Fichier solution" Value="C:\Users\agirard\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch.sln">
+</Property><Property Name="Date" Value="mercredi 22 juin 2011">
+</Property><Property Name="Time" Value="16:55">
+</Property></Properties><Event ErrorLevel="0" Project="DualTouch" Source="DualTouch\DualTouch.vcproj" Description="Converting project file 'C:\Users\agirard\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch.vcproj'.">
+</Event><Event ErrorLevel="1" Project="DualTouch" Source="DualTouch\DualTouch.vcproj" Description="VCWebServiceProxyGeneratorTool is no longer supported. The tool has been removed from your project settings.">
+</Event><Event ErrorLevel="0" Project="DualTouch" Source="DualTouch\DualTouch.vcproj" Description="Done converting to new project file 'C:\Users\agirard\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="DualTouch" Source="DualTouch\DualTouch.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="DualTouch.sln" Description="Solution correctement convertie">
+</Event><Event ErrorLevel="3" Project="" Source="DualTouch.sln" Description="Converted">
+</Event></UpgradeLog>

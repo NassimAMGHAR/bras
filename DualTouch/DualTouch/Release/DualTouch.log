@@ -1,0 +1,45 @@
+﻿La génération a démarré 15/02/2013 16:43:57.
+     1>Projet "C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch\DualTouch.vcxproj" sur le nœud 2 (build cible(s)).
+     1>InitializeBuildStatus:
+         Création de "Release\DualTouch.unsuccessfulbuild", car "AlwaysCreate" a été spécifié.
+       ClCompile:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\sdk\bullet-2.78\src" /I"C:\sdk\freeglut-2.6.0\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D USE_PARALLEL_DISPATCHER /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DualTouch.cpp HapticDevice.cpp Main.cpp Physic.cpp WindowsManager.cpp
+         DualTouch.cpp
+         Note: including lib: glut32.lib
+         
+         HapticDevice.cpp
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>HapticDevice.cpp(420): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+     1>HapticDevice.cpp(421): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+         Main.cpp
+         Note: including lib: glut32.lib
+         
+         Physic.cpp
+         WindowsManager.cpp
+         Note: including lib: glut32.lib
+         
+       Link:
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\DualTouch.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:"C:\Program Files\SensAble\3DTouch\utilities\lib\Win32\Release" /LIBPATH:"C:\Program Files\SensAble\3DTouch\lib\win32" /LIBPATH:"C:\sdk\bullet-2.81-rev2613\bullet-2.81-rev2613\Glut" /LIBPATH:"C:\sdk\bullet-2.81-rev2613\bullet-2.81-rev2613\lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /NODEFAULTLIB:libcmt.lib /MANIFEST /ManifestFile:"Release\DualTouch.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\DualTouch.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\DualTouch.lib" /MACHINE:X86 Release\Camera.obj
+         Release\DualTouch.obj
+         Release\HapticDevice.obj
+         Release\Main.obj
+         Release\Object.obj
+         Release\Physic.obj
+         Release\Renderer.obj
+         Release\WindowsManager.obj
+         Génération de code en cours
+         Fin de la génération du code
+     1>hdu.lib(hduError.obj) : warning LNK4099: PDB 'vc100.pdb' n'a pu être trouvé avec 'hdu.lib(hduError.obj)' ou sur 'C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\vc100.pdb' ; l'objet sera lié sans informations de débogage
+         DualTouch.vcxproj -> C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\DualTouch.exe
+       Manifest:
+         C:\Program Files\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\Release\DualTouch.exe;#1" /manifest Release\DualTouch.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Suppression du fichier "Release\DualTouch.unsuccessfulbuild".
+         Mise à jour de l'horodatage "Release\DualTouch.lastbuildstate".
+     1>Génération du projet "C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch\DualTouch.vcxproj" terminée (build cible(s)).
+
+La génération a réussi.
+
+Temps écoulé 00:00:10.78
