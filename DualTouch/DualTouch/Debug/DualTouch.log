@@ -1,17 +1,12 @@
-﻿La génération a démarré 15/03/2013 18:32:30.
+﻿La génération a démarré 15/03/2013 19:01:48.
      1>Projet "C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch\DualTouch.vcxproj" sur le nœud 2 (build cible(s)).
      1>InitializeBuildStatus:
          Création de "Debug\DualTouch.unsuccessfulbuild", car "AlwaysCreate" a été spécifié.
        ClCompile:
-         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\sdk\bullet-2.78\src" /I"C:\sdk\freeglut-2.6.0\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt HapticDevice.cpp
-         HapticDevice.cpp
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.cpp(423): warning C4305: '+=' : troncation de 'double' à 'btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.cpp(529): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.cpp(532): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\hapticdevice.cpp(543): warning C4018: '<' : incompatibilité signed/unsigned
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\sdk\bullet-2.78\src" /I"C:\sdk\freeglut-2.6.0\include" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Renderer.cpp
+         Renderer.cpp
+         Note: including lib: glut32.lib
+         
        ManifestResourceCompile:
          Toutes les sorties sont à jour.
        Link:
@@ -37,4 +32,4 @@
 
 La génération a réussi.
 
-Temps écoulé 00:00:04.28
+Temps écoulé 00:00:03.32

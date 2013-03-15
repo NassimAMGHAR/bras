@@ -420,7 +420,7 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 					
 					if(!m_hss[i].m_free.m_done){	
 						if(m_variator < VARIATION_MAX)
-							m_variator += 0.008;
+							m_variator += 0.005;
 						//inbetween += velocity ;
 						//inbetween[2] = 0;
 						//hduVector3Dd helpForce(inbetween) ;

@@ -135,7 +135,7 @@ void Renderer::init()
 	glLineWidth(2);
 
 	glEnable(GL_LIGHT0);
-	m_lightPos[0]=100;
+	m_lightPos[0]=0;
 	m_lightPos[1]=-100;
 	m_lightPos[2]=100;
 
@@ -433,7 +433,7 @@ void Renderer::renderShadows()
 			glMultMatrixf(m);
 
 			glColor3f(0.2f,0.2f,0.2f);
-			//drawShadow(m_objects[i]->m_shape,extrusion*m_objects[i]->m_transform->getBasis());
+			drawShadow(m_objects[i]->m_shape,extrusion*m_objects[i]->m_transform->getBasis());
 			glPopMatrix();
 		}
 	}

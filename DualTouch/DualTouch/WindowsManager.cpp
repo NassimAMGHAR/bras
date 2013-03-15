@@ -257,7 +257,7 @@ void WindowsManager::idle()
     time_t dt = (now-m_previous);
 	if(dt>=1)
 	{
-		printf("FPS:%i\n",m_frameCounter);
+		//printf("FPS:%i\n",m_frameCounter);
 		m_previous = now;
 		m_frameCounter=0;
 	}
