@@ -189,9 +189,13 @@ void HapticDevice::setDThrownList(std::vector <btRigidBody *> thrown){
 }
 
 void HapticDevice::setDThrownObject(std::vector <Object *> thrown){
-	for(unsigned int i=0; i< NB_DEVICES_MAX;i++)
-		m_hss[i].setThrownObject(thrown);
+	// to do
 }
+
+void HapticDevice::setDThrownObject(Object * thrown){
+	m_ThrownObject = thrown;
+}
+
 
 void HapticDevice::setThrown(btRigidBody * thrown){
 	for(unsigned int i=0; i< NB_DEVICES_MAX;i++)
@@ -226,6 +230,7 @@ void HapticDevice::init()
 		{
 			printf("Succed to start the scheduler\n");
 		}
+		m_canLaunch = false;
 	}
 }
 
@@ -316,69 +321,97 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 {
 	for(unsigned int i=0;i<m_nbDevices;i++)
 	{
+		// free move
+		if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0 )// (m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_2))
+		{
+			m_hss[i].m_free.m_done = true;			
+		}		
+		
 		if(m_constraints[i] != NULL)
 		{
 			btRigidBody * myBody = &m_constraints[i]->getRigidBodyB();
 		
-			btTransform myTrans = myBody->getWorldTransform();
-			
+			btTransform myTrans = myBody->getWorldTransform();			
+
 			//Check collision  
 			if(m_constraints[i]->getUserConstraintPtr() != NULL)
-			{
+			{  
+				//std::cout<< " se cas la " <<std::endl;
 				m_hss[i].m_free.m_nbCollision = 1;
-				if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0 && (m_oldButtons[i] & HD_DEVICE_BUTTON_1) == 0)
-				{
-					btCollisionObject * object = static_cast<btCollisionObject *>(m_constraints[i]->getUserConstraintPtr());
+				//if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0 && (m_oldButtons[i] & HD_DEVICE_BUTTON_1) == 0)
+				btCollisionObject * object = static_cast<btCollisionObject *>(m_constraints[i]->getUserConstraintPtr());
 				
-					if(object->getInternalType()== btCollisionObject::CO_RIGID_BODY)
+				if(object->getInternalType()== btCollisionObject::CO_RIGID_BODY)
+				{
+					btRigidBody * collideBody = static_cast<btRigidBody *>(object);	
+					if(collideBody->getInvMass()!=0 && collideBody != m_ground)
 					{
-						btRigidBody * collideBody = static_cast<btRigidBody *>(object);
-						if(collideBody->getInvMass()!=0)
-						{
-							if(m_itsConstraints[i] == NULL)
+							if(m_itsConstraints[i] == NULL )
 							{
-								//create constraint
-								btTransform bodyTrans = collideBody->getWorldTransform();
-								m_itsConstraints[i]   = createConstraint(*myBody,*collideBody);
-								dynamic.addConstraint(m_itsConstraints[i],true);
-								m_newConstraint(m_ptr,collideBody,i);
-							}
-							else
-							{
-								//remove constraint
-								dynamic.removeConstraint(m_itsConstraints[i]);
-								delete m_itsConstraints[i];
-								m_itsConstraints[i]=NULL;
-								m_deleteConstraint(m_ptr,collideBody,i);
-								m_hss[i].setThrown(NULL);
-							    m_hss[i].m_free.m_done = true;
-								m_variator = 0;
-							}
-						}
 
+								// catch it if colide with it
+								if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) == 0 )
+								{						
+											//create constraint
+											btTransform bodyTrans = collideBody->getWorldTransform();
+											m_itsConstraints[i]   = createConstraint(*myBody,*collideBody);
+											dynamic.addConstraint(m_itsConstraints[i],true);
+											m_newConstraint(m_ptr,collideBody,i);			
+						
+								}
+							}else
+								// realise it when button 1 pressed
+								if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0)
+								{
+						
+										//remove constraint
+										dynamic.removeConstraint(m_itsConstraints[i]);
+										delete m_itsConstraints[i];
+										m_itsConstraints[i]=NULL;
+										m_deleteConstraint(m_ptr,collideBody,i);
+										//m_hss[i].setThrown(NULL);								
+										m_hss[i].m_free.m_done = true;
+										m_ThrownObject->setColor(blue);
+										m_variator = 0;
+						
+								}
+							
 					}
 					
 				}
+				
+
 			}
 			else
 			{
 				m_hss[i].m_free.m_nbCollision = 0;
-				if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0 && (m_oldButtons[i] & HD_DEVICE_BUTTON_1) == 0)
+				//if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0 && (m_oldButtons[i] & HD_DEVICE_BUTTON_1) == 0)
+				if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_1) != 0)
 				{
-					if(m_itsConstraints[i] != NULL)
+					if(m_itsConstraints[i] != NULL )
 					{
 						//remove constraint
 						m_deleteConstraint(m_ptr,&m_itsConstraints[i]->getRigidBodyB(),i);
 						dynamic.removeConstraint(m_itsConstraints[i]);
 						delete m_itsConstraints[i];
 						m_itsConstraints[i]=NULL;
-					}
+						m_hss[i].m_free.m_done = true;
+						m_ThrownObject->setColor(blue);					
+					}						
 					
 				}
+				
 			}
 
 			if(m_itsConstraints[i]!=NULL)
 				m_hss[i].m_free.m_nbCollision = 1;			
+			else
+				// launch an other target
+				if((m_hss[i].m_free.m_buttons & HD_DEVICE_BUTTON_2) != 0 && (m_oldButtons[i] & HD_DEVICE_BUTTON_2) == 0)
+				{
+				m_hss[i].m_free.m_done = true;
+				m_canLaunch = true;
+				}
 
 			m_oldButtons[i]=m_hss[i].m_free.m_buttons;
 
@@ -390,7 +423,6 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 			btVector3 pos = m_cameraViews[i]->inverse()(myTrans.getOrigin());
 			pos*=SCALE_WORLD_TO_DEVICE;
 			m_hss[i].m_free.m_realPosition.set(pos.getX(),pos.getY(),pos.getZ()+OFFSET_TO_CAMERA); 
-	
 			
 
 			}
@@ -407,10 +439,6 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 				HDdouble y = ball[1] - m_hss[i].m_free.m_position[1]; //current.getY() - effector.y();
 				HDdouble z = ball[2] - m_hss[i].m_free.m_position[2]; //current.getZ() - effector.z();
 				if(inrange(x,y,z)){
-					//truncate(&x,&y,&z);
-					// intersect point
-					//btVector3 vt =  m_hss[i].m_free.m_currentThrown->getInterpolationLinearVelocity();
-					//hduVector3Dd velocity = invertTransform(&(vt), &m_hss[i]);
 					
 					
 				
@@ -421,11 +449,7 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 					if(!m_hss[i].m_free.m_done){	
 						if(m_variator < VARIATION_MAX)
 							m_variator += 0.005;
-						//inbetween += velocity ;
-						//inbetween[2] = 0;
-						//hduVector3Dd helpForce(inbetween) ;
-						//hduVector3Dd helpForce(x, y, z);		
-						//hduVector3Dd helpForce = ComputeForce(&pos,&ball,&velocity);
+					
 						hduVector3Dd helpForce = ForecToImpact(&pos,&impact);
 						if(!helpForce.isZero(EPSILON)){
 							m_hss[i].m_free.m_force = m_variator * helpForce;		
@@ -433,14 +457,25 @@ void  HapticDevice::feedback(btDynamicsWorld &dynamic)
 						}else 
 							{
 							 m_hss[i].m_free.m_done = true;
+							 if(y<5)
+								 m_variator = 0.01;
+							 else
 							 m_variator = 0;
 						    }
 				
-					}else						
+					}else{	
+						if(y<5)
+							 m_variator = 0.01;
+						else
 						 m_variator = 0;
+						 m_hss[i].m_free.m_force = hduVector3Dd(0,0,0);
+					}
 				}
 				else{
-					m_variator = 0;
+					if(y<5)
+						m_variator = 0.01;
+					else
+						m_variator = 0;
 					m_hss[i].m_free.m_force = hduVector3Dd(0,0,0);
 					}
 			hdScheduleSynchronous(sScheduleIn, &m_hss, HD_DEFAULT_SCHEDULER_PRIORITY);
@@ -498,17 +533,19 @@ void HapticSynchronizer::setThrownList(std::vector <btRigidBody *> thrown){
 	m_data->m_thrown = thrown;
 }
 
-void HapticSynchronizer::setThrownObject(std::vector <Object *> thrown){
-	m_data->m_thrown_object = thrown;
-}
-
-
 void HapticSynchronizer::setThrown(btRigidBody * thrown){
 	m_free.m_currentThrown = thrown;
 	m_free.m_done = false;
 	//std::cout<<" set "<<std::endl;
 }
 
+bool HapticDevice::isReadyLaunch(){
+	return m_canLaunch;
+}
+
+void HapticDevice::setWaitLunch(){
+	m_canLaunch = false;
+}
 
 btScalar HapticData::setNear(){
 		
@@ -539,14 +576,14 @@ btScalar HapticData::setNear(){
 		
     };
 	
-		if(j != -1)
+		/*if(j != -1)
 			for(i= 0;i< m_thrown_object.size();i++)
 			{
 				Object* o = m_thrown_object.at(i);
 				o->setColor(blue);
 				if(i == j)
 					o->setColor(green);
-			};
+			};*/
 	
 
 	return tnear;
@@ -572,7 +609,7 @@ bool HapticDevice::inrange(HDdouble x,HDdouble y,HDdouble z){
 	if(y>MXDISTANCE) return false;
 	if(y<MNDISTANCE) return false;
 
-	if(z>MXDISTANCE) return false;
+	if(z>0) return false;
 	//if(z<MNDISTANCE) return false;
 
 	return true;
@@ -603,20 +640,7 @@ hduVector3Dd HapticDevice::ComputeForce(hduVector3Dd* effector, hduVector3Dd* ta
 }
 
 hduVector3Dd HapticDevice::ForecToImpact(hduVector3Dd* effector,hduVector3Dd* impactpos){
-	//hduVector3Dd objectif(*impactpos);
-	hduVector3Dd inbetween = *impactpos - *effector;
-	/*const HDdouble stepSize = 1.0;					
-	if (inbetween.magnitude() > stepSize)
-		{
-		inbetween.normalize();
-		objectif += inbetween*1.0;
-		}
-	else
-		{
-		objectif = *effector;
-		}
-	inbetween = objectif - *effector;
-	//inbetween[2] = 0;*/
+		hduVector3Dd inbetween = *impactpos - *effector;	
 	return inbetween;
 }
 
@@ -627,4 +651,12 @@ void HapticDevice::setImpactPos(btVector3* pos){
 
 void HapticSynchronizer::setImpactPos(btVector3* m_impactPos){
 	m_data->m_impactPos = m_impactPos;
+}
+
+btVector3 HapticDevice::getEffectorPosition(){
+	return m_effectors[0].getOrigin();
+}
+
+void HapticDevice::setGround(btRigidBody* ground){
+	m_ground = ground;
 }

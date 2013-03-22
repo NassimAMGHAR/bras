@@ -25,10 +25,10 @@
 #define MNFORCE -MXFORCE
 #define MXDISTANCE 50
 #define MNDISTANCE -MXDISTANCE
-#define VARIATION_MAX 0.25
+#define VARIATION_MAX 0.3
 
 const btVector3 green(0.0f,1.0f,0.0f);
-const btVector3 orange(0.66f,0.33f,0.22f);
+const btVector3 orange(0.77f,0.55f,0.44f);
 const btVector3 blue(0.0f,0.33f,0.66f);
 
 class HapticData
@@ -45,14 +45,13 @@ class HapticData
 	hduVector3Dd m_position;
 	hduVector3Dd m_force;
 	HDdouble m_transform[16];
-	hduVector3Dd m_realPosition;
+	hduVector3Dd m_realPosition;	
 	HDint m_buttons;
 	bool m_ready;
 	int m_nbCollision;
 	btVector3* m_near;
 	std::vector <btRigidBody *> m_thrown;
-	btRigidBody * m_currentThrown;
-	std::vector <Object *> m_thrown_object;
+	btRigidBody * m_currentThrown;	
 	btScalar setNear();
 	hduVector3Dd m_target;	
 	int m_smother;
@@ -71,8 +70,7 @@ class HapticSynchronizer
 	void setData(HapticData *data){m_data=data;}
 	void setThrownList(std::vector <btRigidBody *> thrown);
 	void setThrown(btRigidBody * thrown);
-	void setImpactPos(btVector3* m_impactPos);
-	void setThrownObject(std::vector <Object *> thrown_object);
+	void setImpactPos(btVector3* m_impactPos);	
 	void setNear(btVector3* pos);
 	HapticData * m_data;
 	HapticData m_free;	
@@ -106,6 +104,7 @@ public:
 	static hduVector3Dd invertTransform(btVector3* trans,HapticSynchronizer* hs);
 	static hduVector3Dd ComputeForce(hduVector3Dd* effector, hduVector3Dd* target, hduVector3Dd* velocity);
 	static hduVector3Dd ForecToImpact(hduVector3Dd* effector,hduVector3Dd* impactpos);
+	btVector3 getEffectorPosition();
 
 	void(*m_newConstraint)(void * ptr,btRigidBody *,unsigned int );
 	void(*m_deleteConstraint)(void * ptr,btRigidBody *,unsigned int );
@@ -115,11 +114,16 @@ public:
 	void setDThrownList(std::vector <btRigidBody *> thrown);
 	void setThrown(btRigidBody * thrown);
 	void setDThrownObject(std::vector <Object *> thrown_object);
+	void setDThrownObject(Object * thrown);
 	void setImpactPos(btVector3* pos);
+
+	bool isReadyLaunch();
+	void setWaitLunch();
 
 	static void truncate(HDdouble* x,HDdouble* y,HDdouble* z);
 	static bool inrange(HDdouble x,HDdouble y,HDdouble z);
-	
+	void setGround(btRigidBody* ground);
+
 private:
 
 	std::string m_name;
@@ -132,6 +136,9 @@ private:
 	HDint m_oldButtons[NB_DEVICES_MAX];	
 	btVector3* m_impactPos;
 	btScalar m_variator; 
+	Object* m_ThrownObject;
+	bool m_canLaunch;
+	btRigidBody* m_ground;
 };
 
 

@@ -17,7 +17,7 @@ void DualTouch::init1()
 	m_velocityZ = 2.0f;
 	m_impactY = -2;
 	m_moveTarget = false;
-	m_timeSpeed = 0.01;
+	m_timeSpeed = 0.02;
 	m_theta = 45;
 	m_lunch_z = 3.5;
 	m_lunch_y = 15;
@@ -57,28 +57,64 @@ void DualTouch::createScene()
 	//ground
 	const btScalar halfSize = 0.5f;
 	btTransform * t = new btTransform(btQuaternion(),btVector3(0,0,-halfSize*2)); 
-	btCollisionShape * shape = new btBoxShape (btVector3(100,halfSize*2,100));
+	btCollisionShape * shape = new btBoxShape (btVector3(30,halfSize*2,40));
 	
-	btRigidBody * body = m_physic.addRigidBody(0,t,shape);
+	btRigidBody * body = m_physic.addRigidBody(5,t,shape);
+	m_hds.setGround(body);
 	//body->setHitFraction(0);
 	//body->setRestitution(0);
 	//body->setFriction(0);
 	//body->setRollingFriction(0);
-	//body->setCollisionFlags( body->getCollisionFlags() | 
-	//btCollisionObject::CF_KINEMATIC_OBJECT); 
-	//body->setActivationState(DISABLE_DEACTIVATION); 
+	body->setCollisionFlags( body->getCollisionFlags() | 
+		btCollisionObject::CF_KINEMATIC_OBJECT); 
+	body->setActivationState(DISABLE_DEACTIVATION); 
 	m_renderer.addObject(new Object(shape,t,neutral));
 
-	
+	addLauncher();
 
+}
+
+void DualTouch::addLauncher(){
+	//
+	btScalar hx = 0.3;
+	btScalar hy = 0.7;
+	btScalar hz = 0.3;
+	btTransform * t = new btTransform(btQuaternion(),btVector3(0,m_lunch_y,hy+0.2)); 
+
+	btCollisionShape * shape = new btBoxShape (btVector3(hx+hx,hy,hz));
+	
+	btRigidBody * body = m_physic.addRigidBody(20,t,shape);
+	m_renderer.addObject(new Object(shape,t,orange));
+
+	body->setCollisionFlags( body->getCollisionFlags() | 
+	btCollisionObject::CF_KINEMATIC_OBJECT); 
+	body->setActivationState(DISABLE_DEACTIVATION);
+
+	t = new btTransform(btQuaternion(btVector3(1,0,0),-0.55),btVector3(0,m_lunch_y+hy,hy+1.5));
+	shape = new btCylinderShape(btVector3(hx,hy*2,hz));
+	m_canon = m_physic.addRigidBody(10,t,shape);
+	m_canon->setCollisionFlags( m_canon->getCollisionFlags() | 
+	btCollisionObject::CF_KINEMATIC_OBJECT); 
+	m_canon->setActivationState(DISABLE_DEACTIVATION);
+	m_renderer.addObject(new Object(shape,t,orange));
+}
+
+void DualTouch::rotateCanon(btVector3* rotate){
+	btTransform myTrans = btTransform();
+	m_canon->getMotionState()->getWorldTransform(myTrans);
+	btQuaternion rot = myTrans.getRotation();
+	btScalar alpha = asin(rotate->x()/rotate->z())*(PI/180);
+	rot.setX(rotate->x());
+	myTrans.setRotation(rot);
+	m_canon->getMotionState()->setWorldTransform(myTrans);
 }
 
 void DualTouch::createCursor(unsigned int deviceId)
 {
-	btCollisionShape * shape = new btSphereShape(0.1f);
+	btCollisionShape * shape = new btSphereShape(Effector_Size);
 	btTransform *t = new btTransform(btQuaternion(),btVector3(0,0,0));
 
-	btRigidBody *rigidBody = m_physic.addRigidBody(1,t,shape);  // < -------------------------------------------------
+	btRigidBody *rigidBody = m_physic.addRigidBody(Effector_Mass,t,shape);  // < -------------------------------------------------
 	cursors[deviceId]=rigidBody;
 	rigidBody->setActivationState(DISABLE_DEACTIVATION);
 
@@ -106,90 +142,74 @@ void DualTouch::createCursor(unsigned int deviceId)
 
 }
 
-void DualTouch::generateCube(){
+void DualTouch::throwObject(){
 	    float hx = 0.3f;
 		float hy = 0.3f;
 		float hz = 0.3f;
 		const btScalar halfSize = 0.5f;
-		int r = 4;
+		int r = 6;
 		int f = rand() % r;
-		btTransform * t = new btTransform(btQuaternion(),btVector3(f-r/2,15,m_lunch_z)); 
+		int initial_x = f-r/2;
+		btVector3 targetpos = btVector3(0,15,m_lunch_z);
+		btTransform * t = new btTransform(btQuaternion(),targetpos); 
 		//btCollisionShape * shape = new btBoxShape (btVector3(hx,hy,hz));
 		// make a trajectory object
 		btCollisionShape * shape = new btSphereShape (hx);	
-		btRigidBody* body = m_physic.addRigidBody(4,t,shape);
-		body->setCollisionFlags( body->getCollisionFlags() | 
-		btCollisionObject::CF_KINEMATIC_OBJECT); 
-		body->setActivationState(DISABLE_DEACTIVATION); 
+		btRigidBody* body = m_physic.addRigidBody(BALL_MASS,t,shape);
+		
 		
 		// z height
-		//body->setLinearVelocity(btVector3(0,-m_velocity*2,m_velocity/4));
+		
 		// make the others know about the throw
+		if(m_curentThrowed != NULL){
+			m_physic.deleteRigidBody(m_curentThrowed);
+			m_renderer.delObject(m_curentObject);
+		}
 		m_curentThrowed = body;
-		m_hds.setThrown(m_curentThrowed);
-		m_hds.setImpactPos(&this->getFinalPos(m_curentThrowed));
+		m_hds.setThrown(m_curentThrowed);		
 		m_curentObject = m_renderer.addObject(new Object(shape,t,blue));
+		m_hds.setDThrownObject(m_curentObject);
+		m_impactY = m_hds.getEffectorPosition().y();		
+		btScalar alpha = setVelocityTarget(m_timeSpeed,m_curentThrowed,initial_x); 
+		btVector3 final = getFinalPos(t,initial_x);
+		m_hds.setImpactPos(&final);
+		//rotateCanon(&targetpos);
 		//m_throwed_object_list.push_back(m_renderer.addObject(new Object(shape,t,blue)));
 		//m_throwed_rigid_list.push_back(body);
 		//m_hds.setDThrownList(m_throwed_rigid_list);
 		//m_hds.setDThrownObject(m_throwed_object_list);
 		//deleteThrowedObjects();
-		m_moveTarget = true;
-		m_time = 0;
+
+		
 }
 
-btVector3 DualTouch::getFinalPos(btRigidBody* target){
-	btScalar time = 0;
-	btTransform* mytrans = new btTransform;
-	target->getMotionState()->getWorldTransform(*mytrans);
+btVector3 DualTouch::getFinalPos(btTransform* target, btScalar vx){
+	btScalar time = 0;	
 	btVector3 gravity = m_physic.m_dynamicsWorld->getGravity();
 	btScalar y = m_lunch_y;
 	btScalar z = 0;
+	btScalar x = 0;
 	while(y>=m_impactY){
 		y = m_velocityY * cos(m_theta) * time;
 		y = m_lunch_y - y;
-		z = (gravity.z()/2 * pow(time,2)) +( m_velocityZ * sin(m_theta)*time) +  m_lunch_z;
+		z = (gravity.z()/2 * pow(time,2)) +( m_velocityZ * sin(m_theta)*time) +  m_lunch_z;		
 		time += m_timeSpeed; 
 	}
-
-	return btVector3(mytrans->getOrigin().x(),y,z);
+	x =vx*time;
+	return btVector3(x,y,z);
 }
 
-void DualTouch::moveTarget(btScalar time,btRigidBody* target){
-	btTransform* mytrans = new btTransform;
-	target->getMotionState()->getWorldTransform(*mytrans);
+btScalar DualTouch::setVelocityTarget(btScalar time,btRigidBody* target,btScalar x){
+	
 	btVector3 gravity = m_physic.m_dynamicsWorld->getGravity();
 	btScalar y = m_velocityY * cos(m_theta) * time;
 	y = m_lunch_y - y;
 	btScalar z = (gravity.z()/2 * pow(time,2)) +( m_velocityZ * sin(m_theta)*time) +  m_lunch_z;
-	
-	mytrans->getOrigin().setY(y);
-	mytrans->getOrigin().setZ(z);
-	target->getMotionState()->setWorldTransform(*mytrans);	
-	//if(y< m_lunch_y + m_impactY )
-	//{
-		// create a new rigidbody for bullet
-		btCollisionShape * shape = new btSphereShape (0.3f);	
-		btRigidBody* newTarget = m_physic.addRigidBody(4,mytrans,shape);
-		// integrate velocity
-		btScalar vy = -m_velocityY * cos(m_theta);
-		btScalar vz = gravity.z()*time  +  m_velocityZ * sin(m_theta);
-		newTarget->setLinearVelocity(btVector3(0,vy,vz));
-		m_hds.setThrown(newTarget);
-		Object* newObject = new Object(shape,mytrans,blue);
 		
-		//delete the previous target
-		m_physic.deleteRigidBody(m_curentThrowed);
-		//m_renderer.delObject(m_curentObject); 
-		m_renderer.replaceObject(m_curentObject, newObject);
-
-		//m_physic.resetRigidBody(target);
-		// update
-		m_curentThrowed = newTarget;
-		m_curentObject = newObject;
-		m_moveTarget = false;
-		m_time = 0;	
-	//}
+	btScalar vy = -m_velocityY * cos(m_theta);
+	btScalar vz = gravity.z()*time  +  m_velocityZ * sin(m_theta);
+	target->setLinearVelocity(btVector3(x,vy,vz));
+	return y/x;	
 }
 
 void DualTouch::deleteThrowedObjects(){
@@ -234,7 +254,7 @@ void DualTouch::reshape(int width, int height)
 
 void DualTouch::display1()
 {
-	m_renderer.setClearColor(red[0],red[1],red[2]);
+	m_renderer.setClearColor(gray[0],gray[1],gray[2]);
 	m_camera1.lookAt();
 	m_renderer.display();
 	glDisable(GL_LIGHTING);
@@ -255,12 +275,11 @@ void DualTouch::idle()
 	m_hds.run();	
 	m_physic.run();
 	m_physic.tick();
-	m_hds.feedback(*m_physic.m_dynamicsWorld);
-	
-	if(m_moveTarget)
-	{
-		m_time+= m_timeSpeed;
-		moveTarget(m_time,m_curentThrowed); 		
+	m_hds.feedback(*m_physic.m_dynamicsWorld);	
+
+	if(m_hds.isReadyLaunch()){
+		throwObject();
+		m_hds.setWaitLunch();
 	}
 }
 
@@ -315,7 +334,7 @@ void DualTouch::keyboard1(unsigned char key, int x, int y)
 {
 	//m_camera1.m_key = key;
 	switch(key){
-		case('t'):generateCube();
+		case('t'):throwObject();
 				break;
 		case('r'):deleteThrowedObjects();
 				break;

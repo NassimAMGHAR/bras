@@ -28,7 +28,7 @@ void WindowsManager::createWindows(int argc, char** argv)
 	else
 		glutInitWindowSize(IntialSize,IntialSize); 
 
-	m_window1 = glutCreateWindow("Dual Touch 1"); 
+	m_window1 = glutCreateWindow("Haptic launch"); 
 	glutPositionWindow(IntialPosition,IntialPosition); 
 
 	m_dt.init1();
@@ -60,6 +60,7 @@ void WindowsManager::createWindows(int argc, char** argv)
 	//glutTimerFunc(0,m_idle2,0);
 	glutIdleFunc(m_idle);
 	glutMainLoop(); 
+	
 }
 
 
@@ -211,11 +212,11 @@ void WindowsManager::getDesktopResolution()
 
 	RECT rects[2];
 	rects[0].bottom=-1;
-	rects[1].bottom=-1;
+	//rects[1].bottom=-1;
 	EnumDisplayMonitors(NULL, NULL, EnumDispProc,reinterpret_cast<LPARAM>(rects));
 
 	m_window1Rect = rects[0];
-	m_window2Rect = rects[1];
+	//m_window2Rect = rects[1];
 }
 
 
@@ -314,8 +315,9 @@ void WindowsManager::keyboardAll(unsigned char key)
 				break;
 	case(' '):	m_dt.reset();
 				break;
-	case(27):	glutDestroyWindow(m_window2);//Escape
-				glutDestroyWindow(m_window1);
+	case(27):	//glutDestroyWindow(m_window2);//Escape			
+				//glutDestroyWindow(m_window1);
+				//exit(0);
 				break;
 	}
 }

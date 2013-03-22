@@ -76,29 +76,18 @@ Object* Renderer::addObject(Object * object)
 
 void Renderer::delObject(Object* o)
 {
-	//o->print();
-	
-	//for (int i=0;i<m_shapecaches.size();i++)
-	//{		
-		/*std::cout<<m_shapecaches[i]<< "       "<<std::endl;
-		std::cout<<o->getshape()->getUserPointer()<< "       "<<std::endl;
-		if((ShapeCache*)(o->getshape()->getUserPointer()) == m_shapecaches[i])
+	int j = 0;
+	for (std::vector<Object*>::iterator i =m_objects.begin(); i != m_objects.end(); i++)
+    {		
+		if(o == m_objects[j])
 		{
-			m_shapecaches[i]->~ShapeCache();
-			btAlignedFree(m_shapecaches[i]);
-		}*/
-	//}
-	
-//	((ShapeCache*)o->getshape()->getUserPointer())->~ShapeCache();
-//	btAlignedFree(o->getshape()->getUserPointer());
-
-	for(unsigned int i=0;i<m_objects.size();i++)
-		if(o == m_objects[i])
-		{
-			m_objects[i] = NULL;
-		//delete m_objects[i];
-		//delete o;
+			delete m_objects[j];
+			m_objects.erase(i);
+			return;
 		}
+
+		j++;
+    }
 	
 }
 

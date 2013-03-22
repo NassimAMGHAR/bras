@@ -1,22 +1,30 @@
-﻿La génération a démarré 15/02/2013 16:43:57.
+﻿La génération a démarré 22/03/2013 17:18:04.
      1>Projet "C:\Users\amghar\Documents\Visual Studio 2010\Projects\DualTouch\DualTouch\DualTouch\DualTouch.vcxproj" sur le nœud 2 (build cible(s)).
      1>InitializeBuildStatus:
-         Création de "Release\DualTouch.unsuccessfulbuild", car "AlwaysCreate" a été spécifié.
+         Mise à jour de l'horodatage "Release\DualTouch.unsuccessfulbuild".
        ClCompile:
-         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\sdk\bullet-2.78\src" /I"C:\sdk\freeglut-2.6.0\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D USE_PARALLEL_DISPATCHER /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DualTouch.cpp HapticDevice.cpp Main.cpp Physic.cpp WindowsManager.cpp
+         C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I"C:\sdk\bullet-2.78\src" /I"C:\sdk\freeglut-2.6.0\include" /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D USE_PARALLEL_DISPATCHER /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt DualTouch.cpp HapticDevice.cpp Main.cpp Object.cpp Physic.cpp Renderer.cpp WindowsManager.cpp
          DualTouch.cpp
          Note: including lib: glut32.lib
          
          HapticDevice.cpp
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(27): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
-     1>HapticDevice.cpp(420): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-     1>HapticDevice.cpp(421): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>c:\users\amghar\documents\visual studio 2010\projects\dualtouch\dualtouch\dualtouch\HapticDevice.h(39): warning C4305: 'argument' : troncation de 'double' à 'const btScalar'
+     1>HapticDevice.cpp(451): warning C4305: '+=' : troncation de 'double' à 'btScalar'
+     1>HapticDevice.cpp(461): warning C4305: '=' : troncation de 'double' à 'btScalar'
+     1>HapticDevice.cpp(468): warning C4305: '=' : troncation de 'double' à 'btScalar'
+     1>HapticDevice.cpp(476): warning C4305: '=' : troncation de 'double' à 'btScalar'
+     1>HapticDevice.cpp(566): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
+     1>HapticDevice.cpp(569): warning C4244: '=' : conversion de 'double' en 'float', perte possible de données
          Main.cpp
          Note: including lib: glut32.lib
          
+         Object.cpp
          Physic.cpp
+         Renderer.cpp
+         Note: including lib: glut32.lib
+         
          WindowsManager.cpp
          Note: including lib: glut32.lib
          
@@ -42,4 +50,4 @@
 
 La génération a réussi.
 
-Temps écoulé 00:00:10.78
+Temps écoulé 00:00:13.05

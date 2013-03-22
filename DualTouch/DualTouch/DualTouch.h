@@ -6,10 +6,14 @@
 #include "HapticDevice.h"
 #include <iostream>
 
-
+const btScalar BALL_MASS = 0.2;
+const btScalar Effector_Mass = 4;
+const btScalar Effector_Size = 0.08f;
+const btScalar PI = 3.1415926535897932384626433832795;
 
 using namespace std;
 
+const btVector3 gray(0.6f,0.6f,0.6f);
 const btVector3 neutral(0.9f,0.9f,0.9f);
 const btVector3 red(1.0f,0.0f,0.0f);
 
@@ -40,10 +44,12 @@ public:
 	void init1();
 	void createScene();
 	void createCursor(unsigned int deviceId);
+	void addLauncher();
+	void rotateCanon(btVector3* rotate);
 
-	btVector3 getFinalPos(btRigidBody* target);
-	void moveTarget(btScalar time,btRigidBody* target);
-	void generateCube();	
+	btVector3 getFinalPos(btTransform* target, btScalar init_vx);
+	btScalar setVelocityTarget(btScalar time,btRigidBody* target,btScalar x);
+	void throwObject();	
 	void deleteThrowedObjects();
 	//callbacks
 	static void newConstraint(void * ptr,btRigidBody * body,unsigned int id);
@@ -78,5 +84,5 @@ public:
 	btScalar m_timeSpeed;
 	btScalar m_impactY;
 	btVector3 m_impactPos;
-
+	btRigidBody* m_canon;
 };
